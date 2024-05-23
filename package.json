@@ -1,0 +1,16 @@
+{
+  "name": "endless-todo-app",
+  "version": "1.0.0",
+  "description": "A never finished todo app",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.2.11"
+  }
+}

@@ -1,0 +1,193 @@
+:root, :host {
+    --et-spacing: 1em;
+    --et-roundness: 48px;
+    --et-box-shadow: 0px 2px 16px #00000050;
+    --et-font-family: system-ui, sans-serif;
+    --et-primary-color: #3131bf;
+    --et-primary-text-color: white;
+    --et-background-color: #c3c3da;
+    font-family: var(--et-font-family);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background-color: var(--et-background-color);
+}
+
+.et-app {
+    display: grid;
+    place-content: center;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--et-spacing);
+}
+
+input[type="text"], button, textarea {
+    border: none;
+    padding: 4px 8px;
+    border-radius: var(--et-roundness);
+    min-height: 48px;
+    box-shadow: var(--et-box-shadow);
+}
+
+.et-add-btn {
+    cursor: pointer;
+    width: 64px;
+    height: 64px;
+    font-size: 48px;
+    background-color: var(--et-primary-color);
+    color: var(--et-primary-text-color);
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -1em;
+    pointer-events: all;
+    transform-origin: bottom;
+}
+
+.et-add-btn.clicked {
+    pointer-events: none;
+    animation: squish 300ms ease-in-out;
+}
+
+.et-new-todo {
+    display: flex;
+    align-items: center;
+    padding: var (--et-spacing) 0;
+}
+
+.et-title {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+
+#message {
+    min-width: 400px;
+    padding: 0px calc(2 * var(--et-spacing));
+}
+
+.et-todo-item {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    place-content: center;
+    align-items: center;
+    gap: var(--et-spacing);
+    font-size: 24px;
+}
+
+.et-todo-item input[type="checkbox"] {
+    width: 32px;
+    height: 32px;
+}
+
+.et-todos-list {
+    margin: 0;
+    padding: 0;
+    margin: var(--et-spacing) 0;
+    display: grid;
+    gap: var(--et-spacing);
+}
+
+et-checkmark + label {
+    padding: 0px 4px;
+    display: inline-block;
+    position: relative;
+    margin-right: auto;
+}
+
+et-checkmark[checked] + label {
+    animation: bounce 400ms forwards ease-in-out;
+}
+
+et-checkmark + label::before {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: calc(50% + 3px);
+    height: 2px;
+    width: 0%;
+    background: black;
+}
+
+et-checkmark[checked] + label::before {
+    animation: strike-through 400ms 200ms forwards ease-in-out;
+}
+
+
+/* keyframes */
+
+@keyframes squish {
+    0% {
+        scale: 1 1;
+        border-bottom-right-radius: 32px;
+        border-bottom-left-radius: 32px;
+    }
+
+    25% {
+        scale: 1.2 0.7;
+        border-bottom-right-radius: 24px;
+        border-bottom-left-radius: 24px;
+    }
+
+    50% {
+        scale: 0.8 1.1;
+        border-bottom-right-radius: 32px;
+        border-bottom-left-radius: 32px;
+    }
+
+    100% {
+        scale: 1 1;
+        border-bottom-right-radius: 32px;
+        border-bottom-left-radius: 32px;
+    }
+}
+
+@keyframes bounce {
+    0% {
+        scale: 1;
+    }
+
+    33% {
+        scale: 1.2;
+    }
+
+    66% {
+        scale: 0.8;
+    }
+
+    100% {
+        scale: 1;
+    }
+}
+
+@keyframes strike-through {
+    0% {
+        width: 0%;
+        translate: -20px 0;
+    }
+
+    33% {
+        width: 110%;
+        translate: 20px 0;
+    }
+
+    66% {
+        width: 90%;
+        translate: -10px 0;
+    }
+
+    100% {
+        width: 100%;
+        translate: 0 0;
+    }
+}
