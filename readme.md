@@ -14,3 +14,6 @@ ai use is permitted for reference and inspiration, but no copy paste, no copilot
 
 - client: vanilla js, css and html
 - server: nodejs, no packages
+
+The youtube series:
+[https://www.youtube.com/watch?v=qSNxLUTeUTo&list=PLgdB8k68YKugN4Enr0UOZXSDVnTTY6kj2]
