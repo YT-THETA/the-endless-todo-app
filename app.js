@@ -1,8 +1,10 @@
 import './styles.css';
 import './components';
+import { createElement, createCheckbox, saveToStorage, getFromStorage } from './utils';
 
 // init and run
 const app = todoApp();
+
 
 // app logic
 function todoApp() {
@@ -30,16 +32,13 @@ function todoApp() {
         messageInput.value = '';
         _renderer.render(_dataService.list());
     }
+    // load the todo's if they are in storage
+    let savedTodos = getFromStorage('teta-todos');
 
-    // dev code
-    _dataService.add({
-        message: 'my new todo',
-        status: false
-    });
-    _dataService.add({
-        message: 'my other new todo',
-        status: false
-    })
+    if (savedTodos) {
+        _dataService.load(savedTodos);
+    }
+
     _renderer.render(_dataService.list());
 }
 
@@ -49,16 +48,29 @@ function todoData() {
     const _todos = [];
     let _idCounter = 0;
 
-
     return {
+
+        load(todos) {
+            // remove all the todo's
+            for (var todo of _todos) {
+                this.delete(todo);
+            }
+            // set the new todo's
+            for (var todo of todos) {
+                this.add(todo);
+            }
+        },
+
         add(todo) {
-            
-       let newId = _idCounter++;
+            _idCounter = _todos.length == 0 ? 0 :  _todos.map(t => t.id).reduce((a,b) => a > b ? a : b);
+            let newId = ++_idCounter;
             todo.id = newId;     
             if (this.get(todo.id)) {
                 console.log('duplicate id!')
             }
             _todos.push(todo);
+            // save our todo's
+            saveToStorage('teta-todos', _todos);
         },
         update(todo) {
             let todoToUpdate = this.get(id);
@@ -68,15 +80,19 @@ function todoData() {
             }
             let index = _todos.indexOf(todoToUpdate);
             _todos[index] = todo;
+            // save our todo's
+            saveToStorage('teta-todos', _todos);
         },
         delete(todo) {
-            let todoToDelete = this.get(id);
+            let todoToDelete = this.get(todo.id);
             if (!todoToDelete) {
                 console.log('no todo found with this id');
                 return;
             }
             let index = _todos.indexOf(todoToDelete);
             _todos.splice(index, 1);
+            // save our todo's
+            saveToStorage('teta-todos', _todos);
         },
         get(id) {
             return _todos.find(t => t.id === id);
@@ -124,25 +140,10 @@ function todoRenderer() {
 
                 // if not, remove the ui item
                 if (!dataItem) {
-                    debugger;
                     _todoList.remove(todoElement);
                 }
             }
         }
     }
 
-}
-
-// utils
-function createElement(tagName, attributes) {
-    let element = document.createElement(tagName);
-    for (var key in attributes) {
-        var value = attributes[key];
-        element.setAttribute(key, value);
-    }
-    return element;
-}
-
-function createCheckbox(size = '48px', color = 'var(--et-primary-color)') {
-    return createElement('et-checkmark', { size: size, color: color });
 }
