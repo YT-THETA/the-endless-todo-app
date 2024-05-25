@@ -123,6 +123,29 @@ et-checkmark[checked] + label::before {
     animation: strike-through 400ms 200ms forwards ease-in-out;
 }
 
+et-checkmark + label > input {
+    font-size: inherit;
+    border-radius: var(--et-roundness);
+    padding: 0 8px;
+    background: white;
+    border: 1px solid transparent;
+    box-shadow: var(--et-box-shadow);
+    transition: 200ms all ease-in-out;
+}
+
+et-checkmark + label > input[readonly] {
+    user-select: none;
+    padding: 0 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    box-shadow: 0px 0px 8px #00000000;
+}
+
+et-checkmark + label > input:focus {
+    outline: none;
+}
+
+
 
 /* keyframes */
 

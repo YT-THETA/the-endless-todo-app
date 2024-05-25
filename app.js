@@ -4,6 +4,7 @@ import { createElement, createCheckbox, saveToStorage, getFromStorage } from './
 
 // init and run
 const app = todoApp();
+window.app = app;
 
 
 // app logic
@@ -17,7 +18,36 @@ function todoApp() {
 
     addTodoButton.addEventListener('click', _onAddTodoButtonClicked);
 
-    appElement.addEventListener('click', _onCheckmarkChange);
+    appElement.addEventListener('click', _onAppClicked);
+    appElement.addEventListener('dblclick', _onAppDoubleClicked);
+
+    function _onAppClicked(event) {
+        _onCheckmarkChange(event);
+        _onClickOutsideCheckmark(event);
+    }
+
+    function _onAppDoubleClicked(event) {
+        _onMessageDoubleClicked(event);
+    }
+
+    function _onMessageDoubleClicked(event) {
+        if (!event.target.closest('[et-todo-id]'))
+            return;
+        let messageInput = event.target;
+
+        if (messageInput.hasAttribute('readonly'))
+            messageInput.removeAttribute('readonly');
+        else
+            messageInput.setAttribute('readonly', '');
+    }
+
+    function _onClickOutsideCheckmark(event) {
+        appElement.querySelectorAll('[et-todo-id] input').forEach(messageInput => {
+            console.log(!messageInput.hasAttribute('readonly'), event.target.closest('[et-todo-id] input'))
+            if (!messageInput.hasAttribute('readonly') && event.target.closest('[et-todo-id] input') !== messageInput)
+                messageInput.setAttribute('readonly', '');
+        });
+    }
 
     function _onCheckmarkChange(event) {
         if (event.target.tagName != 'ET-CHECKMARK')
@@ -28,8 +58,6 @@ function todoApp() {
         let item = _dataService.get(id);
         item.status = status;
         _dataService.update(item);
-
-        console.log(item);
     }
 
     function _onAddTodoButtonClicked() {
@@ -56,6 +84,11 @@ function todoApp() {
     }
 
     _renderer.render(_dataService.list());
+
+    return {
+        renderer: _renderer,
+        dataService: _dataService
+    }
 }
 
 // data logic
@@ -127,11 +160,27 @@ function todoRenderer() {
     function _createTodoItem(todo) {
         let todoItem = createElement('li', { class: 'et-todo-item', 'et-todo-id': todo.id });
         let todoCheckbox = createCheckbox();
-        let todoDescription = createElement('label');
-        todoDescription.innerText = todo.message;
-
+        let todoLabel = createElement('label');
+        const inputSize = todo.message && todo.message.length > 4 ? todo.message.length - 4 : 0;
+        let todoMessage = createElement('input', { readonly: '', value: todo.message, size: inputSize });
+        todoLabel.appendChild(todoMessage);
         todoItem.appendChild(todoCheckbox);
-        todoItem.appendChild(todoDescription);
+        todoItem.appendChild(todoLabel);
+
+        todoMessage.addEventListener('input', (event) => {
+            // resize the input
+            const inputSize = todoMessage && todoMessage.value.length > 4 ? todoMessage.value.length - 4 : 0;
+            todoMessage.setAttribute('size', inputSize);
+        });
+
+        todoMessage.addEventListener('change', (event) => {
+            // update the todo item
+            let id = todoItem.getAttribute('et-todo-id');
+            let item = window.app.dataService.get(id);
+            item.message = todoMessage.value;
+            debugger;
+            window.app.dataService.update(item);
+        });
 
         _todoList.appendChild(todoItem);
         return todoItem;
