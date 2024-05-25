@@ -13,8 +13,24 @@ function todoApp() {
     // wire events
     const messageInput = document.querySelector('#message');
     const addTodoButton = document.querySelector('#addBtn');
+    const appElement = document.querySelector('#et-app');
 
     addTodoButton.addEventListener('click', _onAddTodoButtonClicked);
+
+    appElement.addEventListener('click', _onCheckmarkChange);
+
+    function _onCheckmarkChange(event) {
+        if (event.target.tagName != 'ET-CHECKMARK')
+            return;
+        let checkmark = event.target;
+        let status = checkmark.hasAttribute('checked');
+        let id = checkmark.parentNode.getAttribute('et-todo-id');
+        let item = _dataService.get(id);
+        item.status = status;
+        _dataService.update(item);
+
+        console.log(item);
+    }
 
     function _onAddTodoButtonClicked() {
 
@@ -73,7 +89,7 @@ function todoData() {
             saveToStorage('teta-todos', _todos);
         },
         update(todo) {
-            let todoToUpdate = this.get(id);
+            let todoToUpdate = this.get(todo.id);
             if (!todoToUpdate) {
                 console.log('no todo found with this id');
                 return;
@@ -95,7 +111,7 @@ function todoData() {
             saveToStorage('teta-todos', _todos);
         },
         get(id) {
-            return _todos.find(t => t.id === id);
+            return _todos.find(t => t.id == id);
         },
         list() {
             return _todos;
@@ -130,6 +146,13 @@ function todoRenderer() {
                 // if not, create the ui for that todo item
                 if (!uiItem) {
                     uiItem = _createTodoItem(todo);
+                }
+                let checkmark = uiItem.querySelector('et-checkmark');
+                if (todo.status) {
+                    checkmark.setAttribute('checked', '');
+                }
+                else {
+                    checkmark.removeAttribute('checked');
                 }
             }
 
