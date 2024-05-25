@@ -2,7 +2,7 @@ import styles from './et-checkmark.css?inline';
 
 class ETCheckmark extends HTMLElement {
     
-    static observedAttributes = ["color", "size"];
+    static observedAttributes = ["color", "size", "checked"];
 
     constructor() {
         super();
@@ -27,6 +27,49 @@ class ETCheckmark extends HTMLElement {
         }
         if (name === 'color') {
           this.color = newValue;
+        }
+        if (name === 'checked') {
+            const checkboxInput = this.shadowRoot.querySelector('input[type="checkbox"]');
+
+            if (newValue !== null) {
+
+                // set css classes and input value
+                this.wrapper.classList.add('checked');
+                checkboxInput.checked = true;
+                
+                // js animation
+                const svg = this.wrapper.querySelector('svg');
+                const path = svg.querySelector('path');
+                const circle = svg.querySelector('circle');
+                let totalLength = path.getTotalLength();
+                let steps = 10;
+                let stepSize = totalLength / steps;
+                let keyframes = Array.from(new Array(10).keys())
+                    .map(i => {
+                        let currentLength = totalLength - (stepSize * i);
+                        let currentPoint = path.getPointAtLength(currentLength);
+                        return {
+                            cx: currentPoint.x,
+                            cy: currentPoint.y,
+                            r: 2,
+                            fill: 'var(--_checkmark-color)'
+                        };
+                    });
+                let options = {
+                    easing: 'ease-in-out',
+                    duration: 300
+                }
+                circle.animate(keyframes, options);
+
+
+                // dirty update
+                this.wrapper.classList.add('dirty');
+            }
+            else {
+                // set css classes and input value
+                this.wrapper.classList.remove('checked');
+                checkboxInput.checked = false;
+            }
         }
     }
 
@@ -77,46 +120,13 @@ class ETCheckmark extends HTMLElement {
     }
 
     setupCheckmarkLogic() {
-        const svg = this.wrapper.querySelector('svg');
-        const path = svg.querySelector('path');
-        const circle = svg.querySelector('circle');
-
         this.wrapper.addEventListener('click', () => {
-            this.wrapper.classList.toggle('checked');
-        });
 
-        this.wrapper.addEventListener('click', () => {
-            let checkboxInput = this.shadowRoot.querySelector('input[type="checkbox"]');
-            checkboxInput.checked = !checkboxInput.checked;
-            if (checkboxInput.checked)
+            if (!this.hasAttribute('checked'))
                 this.setAttribute('checked', '');
             else
                 this.removeAttribute('checked');
-            this.wrapper.classList.add('dirty');
-            if (!this.wrapper.classList.contains('checked')) {
-                return;
-            }
-            let totalLength = path.getTotalLength();
-            let steps = 10;
-            let stepSize = totalLength / steps;
-            let keyframes = Array.from(new Array(10).keys())
-                .map(i => {
-                    let currentLength = totalLength - (stepSize * i);
-                    let currentPoint = path.getPointAtLength(currentLength);
-                    return {
-                        cx: currentPoint.x,
-                        cy: currentPoint.y,
-                        r: 2,
-                        fill: 'var(--_checkmark-color)'
-                    };
-                });
-            let options = {
-                easing: 'ease-in-out',
-                duration: 300
-            }
-            circle.animate(keyframes, options);
-        });
-
+         });
     }
 }
 
